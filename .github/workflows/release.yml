@@ -1,0 +1,31 @@
+name: Release Unity Package
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+env:
+  UNITY_PACKAGE_NAME: MarumaCam-${{ github.ref_name }}.unitypackage
+  ASSET_PATH: Assets/Marumasa/MarumaCam
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create unitypackage
+        run: |
+          docker run --rm -u $(id -u):$(id -g) -v "${{ github.workspace }}:/work" -w /work ghcr.io/cafe-horizon/unity-packager:latest ${{ env.ASSET_PATH }} ${{ env.UNITY_PACKAGE_NAME }}
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ github.ref_name }} ${{ env.UNITY_PACKAGE_NAME }} --title "${{ github.ref_name }}" --generate-notes
