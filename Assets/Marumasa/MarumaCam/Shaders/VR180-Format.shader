@@ -83,7 +83,7 @@ Shader "Marumasa/VR180-Format"
 		void surf( Input i, inout SurfaceOutput o )
 		{
 			// VRChatのカメラモードが2（三人称視点など）の場合は描画しない
-			if ( _VRChatCameraMode == 2 ) discard;
+			// if ( _VRChatCameraMode == 2 ) discard;
 
 			// _IsLocalがfalseの場合、カメラとの距離が0.2m(200mm)より遠ければ描画しない
 			if ( !_IsLocal )
@@ -97,7 +97,7 @@ Shader "Marumasa/VR180-Format"
 			bool isVR = asymmetric > 0.001;
 
 			// VRChatカメラモードが0（First Person）かつVRモードの場合は描画しない
-			if ( _VRChatCameraMode == 0 && isVR ) discard;
+			// if ( _VRChatCameraMode == 0 && isVR ) discard;
 
 			// スクリーン座標の正規化
 			float4 screenPosNorm = i.screenPos / (i.screenPos.w + 1e-7);
