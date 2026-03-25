@@ -79,6 +79,10 @@ Shader "Marumasa/VR180-Format"
 				float3 objectPos = float3( unity_ObjectToWorld[0].w, unity_ObjectToWorld[1].w, unity_ObjectToWorld[2].w );
 				if ( distance( _WorldSpaceCameraPos, objectPos ) > 0.2 ) o.discardFlag = 1;
 			}
+
+			float asymmetric = abs( unity_CameraProjection[0][2] );
+			bool isVR = asymmetric > 0.001;
+			if ( _VRChatCameraMode == 0 && isVR ) o.discardFlag = 1;
 		}
 
 		inline half4 LightingUnlit( SurfaceOutput s, half3 lightDir, half atten )
