@@ -30,6 +30,7 @@ Shader "Marumasa/BodySurface"
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float discardFlag : TEXCOORD1;
             };
 
             sampler2D _MainTex;
@@ -40,29 +41,19 @@ Shader "Marumasa/BodySurface"
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                
+                float cotFov = abs(UNITY_MATRIX_P._m11);
+                float aspectDiff = abs(abs(UNITY_MATRIX_P._m00) - cotFov);
+                float stereoOffset = abs(UNITY_MATRIX_P._m02);
+                float isPerspective = UNITY_MATRIX_P._m33; 
+                o.discardFlag = (abs(cotFov - 1.0) < 0.05 && aspectDiff < 0.01 && stereoOffset < 0.01 && isPerspective == 0) ? 1.0 : 0.0;
+                
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                
-                // FOVが90度付近 (cot(fov/2) == 1)
-                // プラットフォームにより符号が異なる可能性があるため絶対値で比較
-                float cotFov = abs(UNITY_MATRIX_P._m11);
-                
-                // アスペクト比1:1 (P[0][0] == P[1][1])
-                float aspectDiff = abs(abs(UNITY_MATRIX_P._m00) - cotFov);
-                
-                // 非ステレオ (P[0][2] == 0)
-                // ステレオ投影行列では視差のため0以外になる
-                float stereoOffset = abs(UNITY_MATRIX_P._m02);
-
-                // 透視投影かどうかの判定 (Perspectiveなら_m33は0)
-                float isPerspective = UNITY_MATRIX_P._m33; 
-
-                // 判定：FOV90度(誤差5%) && 正方形(誤差1%) && 非ステレオ(誤差1%) && 透視投影
-                if (abs(cotFov - 1.0) < 0.05 && aspectDiff < 0.01 && stereoOffset < 0.01 && isPerspective == 0) discard;
-
+                if (i.discardFlag > 0.5) discard;
                 fixed4 c = tex2D(_MainTex, i.uv);
                 return c;
             }
