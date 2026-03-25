@@ -71,7 +71,21 @@ Shader "Marumasa/VR180-Preview"
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 // オブジェクトの回転に追従するため、カメラ相対のベクトルを使用
                 float3 objSpaceCameraPos = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos, 1.0)).xyz;
-                o.viewDir = v.vertex.xyz - objSpaceCameraPos;
+                float3 viewDir = v.vertex.xyz - objSpaceCameraPos;
+
+                // -45度回転 (左に90度ずれていたのを修正)
+                float3 rotDir = viewDir;
+                float k = 0.70710678;
+                rotDir.x = (viewDir.x - viewDir.z) * k;
+                rotDir.z = (viewDir.x + viewDir.z) * k;
+                
+                // 右目は映像が180度回転してしまっているため、視線ベクトルを180度(Y軸回り)回転させる
+                if (unity_StereoEyeIndex == 1) {
+                    rotDir.x = -rotDir.x;
+                    rotDir.z = -rotDir.z;
+                }
+                o.viewDir = rotDir;
+
                 return o;
             }
 
@@ -191,25 +205,13 @@ Shader "Marumasa/VR180-Preview"
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-                float3 viewDir = i.viewDir;
+                float3 rotDir = i.viewDir;
                 
                 float2 textureUV;
                 float mask;
                 int texIndex;
                 bool isRightEye = (unity_StereoEyeIndex == 1); // 0: 左目, 1: 右目
 
-                // -45度回転 (左に90度ずれていたのを修正)
-                float3 rotDir = viewDir;
-                float k = 0.70710678;
-                rotDir.x = (viewDir.x - viewDir.z) * k;
-                rotDir.z = (viewDir.x + viewDir.z) * k;
-                
-                // 右目は映像が180度回転してしまっているため、視線ベクトルを180度(Y軸回り)回転させる
-                if (isRightEye) {
-                    rotDir.x = -rotDir.x;
-                    rotDir.z = -rotDir.z;
-                }
-                
                 // 視線ベクトルと目の情報から、サンプリング座標とテクスチャインデックスを計算
                 CalculateCubeUV(rotDir, abs(rotDir), isRightEye, textureUV, texIndex, mask);
 
