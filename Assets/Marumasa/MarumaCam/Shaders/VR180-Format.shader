@@ -31,7 +31,7 @@ Shader "Marumasa/VR180-Format"
 		}
 		
 		Cull Front
-		ZWrite Off
+		ZWrite On
 		ZTest Always
 		
 		CGPROGRAM
@@ -43,6 +43,7 @@ Shader "Marumasa/VR180-Format"
 		struct Input
 		{
 			float4 screenPos;
+			float discardFlag;
 		};
 
 		uniform sampler2D _LeftEyeTex0;
@@ -71,6 +72,13 @@ Shader "Marumasa/VR180-Format"
 
 			v.vertex.xyz *= 64.0;
 			v.vertex.w = 1;
+
+			o.discardFlag = 0;
+			if ( !_IsLocal )
+			{
+				float3 objectPos = float3( unity_ObjectToWorld[0].w, unity_ObjectToWorld[1].w, unity_ObjectToWorld[2].w );
+				if ( distance( _WorldSpaceCameraPos, objectPos ) > 0.2 ) o.discardFlag = 1;
+			}
 		}
 
 		inline half4 LightingUnlit( SurfaceOutput s, half3 lightDir, half atten )
@@ -82,33 +90,16 @@ Shader "Marumasa/VR180-Format"
 
 		void surf( Input i, inout SurfaceOutput o )
 		{
-			// VRChatのカメラモードが2（三人称視点など）の場合は描画しない
-			// if ( _VRChatCameraMode == 2 ) discard;
-
-			// _IsLocalがfalseの場合、カメラとの距離が0.2m(200mm)より遠ければ描画しない
-			if ( !_IsLocal )
-			{
-				float3 objectPos = float3( unity_ObjectToWorld[0].w, unity_ObjectToWorld[1].w, unity_ObjectToWorld[2].w );
-				if ( distance( _WorldSpaceCameraPos, objectPos ) > 0.2 ) discard;
-			}
-
-			// 投影行列の非対称性からVRモードかどうかを判定
-			float asymmetric = abs( unity_CameraProjection[0][2] );
-			bool isVR = asymmetric > 0.001;
-
-			// VRChatカメラモードが0（First Person）かつVRモードの場合は描画しない
-			// if ( _VRChatCameraMode == 0 && isVR ) discard;
+			if ( i.discardFlag > 0.5 ) discard;
 
 			// スクリーン座標の正規化
 			float4 screenPosNorm = i.screenPos / (i.screenPos.w + 1e-7);
 			screenPosNorm.z = ( UNITY_NEAR_CLIP_VALUE >= 0 ) ? screenPosNorm.z : screenPosNorm.z * 0.5 + 0.5;
 
 			// スクリーン座標を極座標（方位角・仰角）に変換
-			// RemapUVを展開: 0..1 -> -PI..PI (ラジアンに変換)
-			float2 polarCoords = screenPosNorm.xy * (UNITY_PI * 2.0) - UNITY_PI;
-
-			float azimuth = polarCoords.x + radians( 45.0 );
-			float elevation = polarCoords.y * 0.5;
+			// 定数計算を展開し最適化 (UNITY_PI * 2.0 = 6.2831853, radians(45.0) = 0.78539816)
+			float azimuth = screenPosNorm.x * 6.2831853 - 2.35619449;
+			float elevation = (screenPosNorm.y * 6.2831853 - 3.14159265) * 0.5;
 
 			float cosElevation = cos( elevation );
 			float sinElevation = sin( elevation );
