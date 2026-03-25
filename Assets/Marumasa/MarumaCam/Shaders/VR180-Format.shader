@@ -72,7 +72,7 @@ Shader "Marumasa/VR180-Format"
 		{
 			UNITY_INITIALIZE_OUTPUT( Input, o );
 
-			v.vertex.xyz *= 64.0;
+			v.vertex.xyz *= 640.0;
 			v.vertex.w = 1;
 
 			o.discardFlag = 0;
