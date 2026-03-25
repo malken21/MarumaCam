@@ -17,6 +17,7 @@ Shader "Marumasa/VR180-Format"
 
 
 		[Toggle] _IsLocal( "IsLocal", Float ) = 0
+		[Toggle] _EnableDesktopJack( "Enable Desktop Jack", Float ) = 0
 		[HideInInspector] __dirty( "", Int ) = 1
 	}
 
@@ -61,6 +62,7 @@ Shader "Marumasa/VR180-Format"
 
 
 		uniform bool _IsLocal;
+		uniform bool _EnableDesktopJack;
 		uniform float _ScreenWidth;
 		uniform float _ScreenHeight;
 		uniform int _VRChatCameraMode;
@@ -83,6 +85,7 @@ Shader "Marumasa/VR180-Format"
 			float asymmetric = abs( unity_CameraProjection[0][2] );
 			bool isVR = asymmetric > 0.001;
 			if ( _VRChatCameraMode == 0 && isVR ) o.discardFlag = 1;
+			if ( _VRChatCameraMode == 0 && !_EnableDesktopJack && !isVR ) o.discardFlag = 1;
 		}
 
 		inline half4 LightingUnlit( SurfaceOutput s, half3 lightDir, half atten )

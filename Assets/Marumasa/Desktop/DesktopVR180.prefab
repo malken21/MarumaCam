@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: 
-  ViewPosition: {x: 0, y: 1.2, z: 0.2}
+  ViewPosition: {x: 0, y: 1.2, z: 0.01}
   Animations: 0
   ScaleIPD: 1
   lipSync: 0
@@ -420,6 +420,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4834405920557595826}
     m_Modifications:
+    - target: {fileID: 5676544298290029, guid: 40d2f745d2c242041bb55c8f62d89988, type: 3}
+      propertyPath: Control.value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4369331724490941646, guid: 40d2f745d2c242041bb55c8f62d89988,
         type: 3}
       propertyPath: m_Name
