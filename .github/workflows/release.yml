@@ -22,7 +22,7 @@ jobs:
 
       - name: Create unitypackage
         run: |
-          docker run --rm -u $(id -u):$(id -g) -v "${{ github.workspace }}:/work" -w /work ghcr.io/cafe-horizon/unity-packager:latest ${{ env.ASSET_PATH }} ${{ env.UNITY_PACKAGE_NAME }}
+          docker compose run --rm -u $(id -u):$(id -g) unity-packager
 
       - name: Create GitHub Release
         env:
