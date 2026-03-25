@@ -1,0 +1,7 @@
+services:
+  unity-packager:
+    image: ghcr.io/cafe-horizon/unity-packager:latest
+    volumes:
+      - .:/work
+    working_dir: /work
+    command: ${ASSET_PATH} ${UNITY_PACKAGE_NAME}
