@@ -424,6 +424,21 @@ PrefabInstance:
       propertyPath: Control.value
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2691719018241339188, guid: 40d2f745d2c242041bb55c8f62d89988,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2691719018241339188, guid: 40d2f745d2c242041bb55c8f62d89988,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2691719018241339188, guid: 40d2f745d2c242041bb55c8f62d89988,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4369331724490941646, guid: 40d2f745d2c242041bb55c8f62d89988,
         type: 3}
       propertyPath: m_Name
