@@ -72,7 +72,13 @@ Shader "Marumasa/VR180-Format"
 		{
 			UNITY_INITIALIZE_OUTPUT( Input, o );
 
-			v.vertex.xyz *= 640.0;
+			float3 worldPos = mul(unity_ObjectToWorld, float4(v.vertex.xyz * 640.0, 1.0)).xyz;
+			float3 camToVertex = worldPos - _WorldSpaceCameraPos;
+			if(length(camToVertex) > 5.0) {
+				camToVertex = normalize(camToVertex) * 5.0;
+			}
+			float3 newWorldPos = _WorldSpaceCameraPos + camToVertex;
+			v.vertex.xyz = mul(unity_WorldToObject, float4(newWorldPos, 1.0)).xyz;
 			v.vertex.w = 1;
 
 			o.discardFlag = 0;
