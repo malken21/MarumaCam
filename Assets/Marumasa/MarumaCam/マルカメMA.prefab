@@ -74,7 +74,7 @@ GameObject:
   - component: {fileID: 6811017843555463963}
   - component: {fileID: 3928919977289567143}
   m_Layer: 0
-  m_Name: MarumaCam
+  m_Name: "\u30DE\u30EB\u30AB\u30E1MA"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
